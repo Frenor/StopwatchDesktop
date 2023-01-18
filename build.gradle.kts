@@ -7,12 +7,18 @@ plugins {
 }
 
 group = "com.nordmoen"
-version = "0.1"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 dependencies {
@@ -22,8 +28,6 @@ dependencies {
     macAmd64(compose.desktop.macos_x64)
     macAarch64(compose.desktop.macos_arm64)
     windowsAmd64(compose.desktop.windows_x64)
-
-
 }
 
 compose.desktop {
@@ -32,7 +36,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "KotlinJvmComposeDesktopApplication"
+            packageName = "stopwatch-desktop"
             packageVersion = "1.0.0"
         }
     }
