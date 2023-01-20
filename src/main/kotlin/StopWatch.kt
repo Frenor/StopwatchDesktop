@@ -50,6 +50,8 @@ class StopWatch {
         coroutineScopeStopwatch.cancel()
         coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
         duration = "00:00.0"
+        roundTimeString.clear()
+        roundSplitString.clear()
         stopwatchMillis = 0L
     }
 

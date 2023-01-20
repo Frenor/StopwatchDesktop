@@ -1,35 +1,93 @@
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.sp
+import kotlin.math.absoluteValue
+import kotlin.math.ceil
 
 @Composable
 fun TimeDisplay(
     formattedTime: String, formattedDate: String, modifier: Modifier
 ) {
-    var fontSize by remember { mutableStateOf(0f) }
     Column(
-        modifier = modifier.onGloballyPositioned { coordinates ->
-            fontSize = coordinates.size.width.toFloat() / 5
-        },
+        modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
+        AutoSizeText(
             text = formattedTime,
-            maxLines = 1,
-            softWrap = false,
-            fontSize = fontSize.sp,
+            fontWeight = FontWeight.Bold,
         )
-        Text(
+        AutoSizeText(
             text = formattedDate,
-            maxLines = 1,
-            softWrap = false,
-            fontSize = (fontSize * 0.8).sp,
+            fontWeight = FontWeight.Light,
+        )
+    }
+}
+
+@Composable
+fun AutoSizeText(
+    text: String,
+    fontWeight: FontWeight? = null,
+) {
+    BoxWithConstraints(contentAlignment = Alignment.BottomEnd) {
+        var shrunkFontSize = 500.sp
+
+        val calculateIntrinsics = @Composable {
+            val mergedStyle = TextStyle(
+                fontSize = shrunkFontSize,
+                fontWeight = fontWeight,
+            )
+            Paragraph(
+                text = text,
+                style = mergedStyle,
+                constraints = Constraints(maxWidth = ceil(LocalDensity.current.run { maxWidth.toPx() }).toInt()),
+                density = LocalDensity.current,
+                fontFamilyResolver = LocalFontFamilyResolver.current,
+                spanStyles = listOf(),
+                placeholders = listOf(),
+                maxLines = 1,
+                ellipsis = false
+            )
+        }
+
+        var intrinsics = calculateIntrinsics()
+
+        val targetWidth = maxWidth * 0.95f
+
+        check(targetWidth.isFinite) { "maxFontSize must be specified if the target with isn't finite!" }
+
+        with(LocalDensity.current) {
+            // this loop will attempt to quickly find the correct size font by scaling it by the error
+            // it only runs if the max font size isn't specified or the font must be smaller
+            // minIntrinsicWidth is "The width for text if all soft wrap opportunities were taken."
+            if (targetWidth < intrinsics.minIntrinsicWidth.toDp()) while ((targetWidth - intrinsics.minIntrinsicWidth.toDp()).toPx().absoluteValue.toDp() > 60.dp / 2f) {
+                shrunkFontSize *= targetWidth.toPx() / intrinsics.minIntrinsicWidth
+                intrinsics = calculateIntrinsics()
+            }
+            // checks if the text fits in the bounds and scales it by 90% until it does
+            while (intrinsics.didExceedMaxLines || maxHeight < intrinsics.height.toDp() || maxWidth < intrinsics.minIntrinsicWidth.toDp()) {
+                shrunkFontSize *= 0.9f
+                intrinsics = calculateIntrinsics()
+            }
+        }
+
+        Text(
+            text = text,
+            fontSize = shrunkFontSize,
+            fontWeight = fontWeight,
         )
     }
 }

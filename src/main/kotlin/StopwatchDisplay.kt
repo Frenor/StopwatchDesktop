@@ -1,28 +1,28 @@
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun StopwatchDisplay(
     formattedTime: String,
     timestamps: List<String>,
     splits: List<String>,
-    startStopStopwatch: () -> Unit,
-    roundStopwatch: () -> Unit,
-    resetStopwatch: () -> Unit,
-    isStopwatchActive: Boolean,
 ) {
-    Row {
-        Column { Text(formattedTime, fontSize = 40.sp) }
+    Row(modifier = Modifier.padding(top = 40.dp)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            AutoSizeText(
+                formattedTime,
+            )
+        }
         Spacer(modifier = Modifier.size(10.dp))
-        Row {
+        Row(modifier = Modifier.weight(1f)) {
             Column {
                 Text("Klokkeslett")
                 for (timestamp in timestamps) {
@@ -39,12 +39,4 @@ fun StopwatchDisplay(
             }
         }
     }
-    Row {
-        Button(onClick = startStopStopwatch) { Text(if (isStopwatchActive) "Stop" else "Start") }
-        Spacer(modifier = Modifier.size(10.dp))
-        Button(onClick = roundStopwatch) { Text("Runde") }
-        Spacer(modifier = Modifier.size(10.dp))
-        Button(onClick = resetStopwatch) { Text("Tilbakestill") }
-    }
-
 }

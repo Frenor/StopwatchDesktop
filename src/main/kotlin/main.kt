@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -30,26 +31,69 @@ fun App() {
                     formattedTime = stopWatch.duration,
                     timestamps = stopWatch.roundTimeString,
                     splits = stopWatch.roundSplitString,
-                    startStopStopwatch = stopWatch::startStopStopwatch,
-                    resetStopwatch = stopWatch::resetStopwatch,
-                    roundStopwatch = stopWatch::roundStopwatch,
-                    isStopwatchActive = stopWatch.isStopwatchActive
                 )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = stopWatch::startStopStopwatch
+                    ) { Text(if (stopWatch.isStopwatchActive) "Stopp" else "Start") }
+                    Spacer(Modifier.size(20.dp))
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = stopWatch::roundStopwatch
+                    ) {
+                        Text("Runde")
+                    }
+                    Spacer(Modifier.size(20.dp))
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            if (stopWatch.roundSplitString.isEmpty()) {
+                                stopWatch.resetStopwatch()
+                                isStopwatch = false
+                            } else {
+                                stopWatch.resetStopwatch()
+                            }
+                        }
+                    ) {
+                        Text(if (stopWatch.roundSplitString.isEmpty()) "Avslutt" else "Tilbakestill")
+                    }
+                }
             } else if (isCPR) {
                 BeatDisplay(
-                    beat = cpr.beat, totalBeat = cpr.totalBeat, start = cpr::startCPR, stop = cpr::stopCPR
+                    beat = cpr.beat, totalBeat = cpr.totalBeat
                 )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = cpr::startCPR
+                    ) { Text("Start HLR") }
+                    Spacer(Modifier.size(20.dp))
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = { cpr.stopCPR(); isCPR = false }) {
+                        Text("Stopp HLR")
+                    }
+                }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(modifier = Modifier.fillMaxWidth(0.5f), onClick = { isStopwatch = false; isCPR = true }) {
-                        Text(
-                            "HLR"
-                        )
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = { isStopwatch = false; isCPR = true }) {
+                        Text("HLR")
                     }
-                    Button(modifier = Modifier.fillMaxWidth(),
-                        onClick = { isStopwatch = true; isCPR = false }) { Text("Stoppeklokke") }
+                    Spacer(Modifier.size(20.dp))
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = { isStopwatch = true; isCPR = false }) {
+                        Text("Stoppeklokke")
+                    }
                 }
             }
         }
@@ -58,6 +102,7 @@ fun App() {
 
 fun main() = application {
     Window(title = "Stoppeklokka", onCloseRequest = ::exitApplication) {
+        this.window.isAlwaysOnTop = true
         App()
     }
 }

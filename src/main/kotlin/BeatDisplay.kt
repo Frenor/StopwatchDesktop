@@ -2,7 +2,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,10 +17,8 @@ import androidx.compose.ui.unit.sp
 fun BeatDisplay(
     beat: Int,
     totalBeat: Int,
-    start: () -> Unit,
-    stop: () -> Unit,
 ) {
-    Row(modifier = Modifier.padding(6.dp).fillMaxWidth()) {
+    Row(modifier = Modifier.padding(top = 30.dp, start = 6.dp, end = 6.dp).fillMaxWidth()) {
         for (i in 0..3) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -50,7 +47,7 @@ fun BeatDisplay(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .weight(1f)
-                .padding(10.dp)
+                .padding(5.dp)
                 .aspectRatio(1f)
                 .clip(shape = RoundedCornerShape(6.dp))
                 .background(Color.LightGray)
@@ -61,10 +58,5 @@ fun BeatDisplay(
                 textAlign = TextAlign.Center,
             )
         }
-    }
-    Row {
-        Button(onClick = start) { Text("Start CPR") }
-        Spacer(modifier = Modifier.size(10.dp))
-        Button(onClick = stop) { Text("Stop CPR") }
     }
 }
