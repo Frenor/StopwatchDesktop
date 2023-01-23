@@ -42,7 +42,7 @@ fun AutoSizeText(
     text: String,
     fontWeight: FontWeight? = null,
 ) {
-    BoxWithConstraints(contentAlignment = Alignment.BottomEnd) {
+    BoxWithConstraints(contentAlignment = Alignment.TopCenter) {
         var shrunkFontSize = 500.sp
 
         val calculateIntrinsics = @Composable {
@@ -65,21 +65,18 @@ fun AutoSizeText(
 
         var intrinsics = calculateIntrinsics()
 
-        val targetWidth = maxWidth * 0.95f
+        val targetWidth = maxWidth * 0.90f
 
         check(targetWidth.isFinite) { "maxFontSize must be specified if the target with isn't finite!" }
 
         with(LocalDensity.current) {
-            // this loop will attempt to quickly find the correct size font by scaling it by the error
-            // it only runs if the max font size isn't specified or the font must be smaller
-            // minIntrinsicWidth is "The width for text if all soft wrap opportunities were taken."
             if (targetWidth < intrinsics.minIntrinsicWidth.toDp()) while ((targetWidth - intrinsics.minIntrinsicWidth.toDp()).toPx().absoluteValue.toDp() > 60.dp / 2f) {
                 shrunkFontSize *= targetWidth.toPx() / intrinsics.minIntrinsicWidth
                 intrinsics = calculateIntrinsics()
             }
             // checks if the text fits in the bounds and scales it by 90% until it does
             while (intrinsics.didExceedMaxLines || maxHeight < intrinsics.height.toDp() || maxWidth < intrinsics.minIntrinsicWidth.toDp()) {
-                shrunkFontSize *= 0.9f
+                shrunkFontSize *= 0.95f
                 intrinsics = calculateIntrinsics()
             }
         }
