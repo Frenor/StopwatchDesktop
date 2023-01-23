@@ -29,8 +29,8 @@ fun App() {
             if (isStopwatch) {
                 StopwatchDisplay(
                     formattedTime = stopWatch.duration,
-                    timestamps = stopWatch.roundTimeString,
-                    splits = stopWatch.roundSplitString,
+                    timestamps = stopWatch.intervalStartString,
+                    splits = stopWatch.intervalDurationString,
                     sinceLast = stopWatch.timeSinceLastString
                 )
                 Row(
@@ -44,7 +44,7 @@ fun App() {
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            if (stopWatch.roundSplitString.isEmpty()) {
+                            if (stopWatch.intervalDurationString.isEmpty()) {
                                 stopWatch.resetStopwatch()
                                 isStopwatch = false
                             } else {
@@ -52,7 +52,7 @@ fun App() {
                             }
                         }
                     ) {
-                        Text(if (stopWatch.roundSplitString.isEmpty()) "Avslutt" else "Tilbakestill")
+                        Text(if (stopWatch.intervalDurationString.isEmpty()) "Avslutt" else "Tilbakestill")
                     }
                 }
             } else if (isCPR) {

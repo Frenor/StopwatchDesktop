@@ -9,10 +9,10 @@ import kotlin.time.toDuration
 
 class StopWatch {
     var duration by mutableStateOf("00:00.0")
-    var roundTimeString = mutableStateListOf<String>()
-    var roundSplitString = mutableStateListOf<String>()
+    var intervalStartString = mutableStateListOf<String>()
+    var intervalDurationString = mutableStateListOf<String>()
     var timeSinceLastString = mutableStateListOf<String>()
-    private var intervalStartMillis = mutableStateListOf<Long>()
+    private var intervalStoppedMillis = mutableStateListOf<Long>()
     private var intervalMillis = mutableStateListOf<Long>()
     private var coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
     private var stopwatchMillis = 0L
@@ -30,15 +30,15 @@ class StopWatch {
 
     private fun startInterval() {
 
-        val sinceLastMillis = if (intervalStartMillis.isEmpty()) {
+        val sinceLastMillis = if (intervalStoppedMillis.isEmpty()) {
             0
         } else {
-            System.currentTimeMillis() - intervalStartMillis.last()
+            System.currentTimeMillis() - intervalStoppedMillis.last()
         }
         timeSinceLastString.add(formatDuration(sinceLastMillis.toDuration(DurationUnit.MILLISECONDS)))
+        intervalStartString.add(formatTime(LocalDateTime.now()))
 
         intervalStartTimeMillis = System.currentTimeMillis()
-        intervalStartMillis.add(intervalStartTimeMillis)
         isStopwatchInInterval = true
         coroutineScopeStopwatch.launch {
             while (isStopwatchInInterval) {
@@ -52,9 +52,9 @@ class StopWatch {
 
     private fun stopInterval() {
         if (!isStopwatchInInterval) return
+        intervalStoppedMillis.add(System.currentTimeMillis())
 
-        roundTimeString.add(formatTime(LocalDateTime.now()))
-        roundSplitString.add(
+        intervalDurationString.add(
             formatDuration(
                 stopwatchMillis.toDuration(DurationUnit.MILLISECONDS)
             )
@@ -73,8 +73,8 @@ class StopWatch {
         coroutineScopeStopwatch.cancel()
         coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
         duration = "00:00.0"
-        roundTimeString.clear()
-        roundSplitString.clear()
+        intervalStartString.clear()
+        intervalDurationString.clear()
         timeSinceLastString.clear()
         stopwatchMillis = 0L
     }
