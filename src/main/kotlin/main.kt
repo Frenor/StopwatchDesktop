@@ -31,21 +31,15 @@ fun App() {
                     formattedTime = stopWatch.duration,
                     timestamps = stopWatch.roundTimeString,
                     splits = stopWatch.roundSplitString,
+                    sinceLast = stopWatch.timeSinceLastString
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
                         modifier = Modifier.weight(1f),
-                        onClick = stopWatch::startStopStopwatch
-                    ) { Text(if (stopWatch.isStopwatchActive) "Stopp" else "Start") }
-                    Spacer(Modifier.size(20.dp))
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = stopWatch::roundStopwatch
-                    ) {
-                        Text("Runde")
-                    }
+                        onClick = stopWatch::startStopInterval
+                    ) { Text(if (stopWatch.isStopwatchInInterval) "Stopp intervall" else "Start intervall") }
                     Spacer(Modifier.size(20.dp))
                     Button(
                         modifier = Modifier.weight(1f),

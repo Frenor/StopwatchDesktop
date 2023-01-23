@@ -11,65 +11,73 @@ class StopWatch {
     var duration by mutableStateOf("00:00.0")
     var roundTimeString = mutableStateListOf<String>()
     var roundSplitString = mutableStateListOf<String>()
-    private var roundMillis = mutableStateListOf<Long>()
+    var timeSinceLastString = mutableStateListOf<String>()
+    private var intervalStartMillis = mutableStateListOf<Long>()
+    private var intervalMillis = mutableStateListOf<Long>()
     private var coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
     private var stopwatchMillis = 0L
-    private var stopwatchLatestTimeMillis = 0L
-    var isStopwatchActive by mutableStateOf(false)
+    private var intervalStartTimeMillis = 0L
+    var isStopwatchInInterval by mutableStateOf(false)
 
-    fun startStopStopwatch() {
-        if (isStopwatchActive) {
-            stopStopwatch()
+    fun startStopInterval() {
+        if (isStopwatchInInterval) {
+            stopInterval()
         } else {
-            startStopwatch()
+            startInterval()
         }
     }
 
-    private fun startStopwatch() {
-        stopwatchLatestTimeMillis = System.currentTimeMillis()
-        isStopwatchActive = true
+
+    private fun startInterval() {
+
+        val sinceLastMillis = if (intervalStartMillis.isEmpty()) {
+            0
+        } else {
+            System.currentTimeMillis() - intervalStartMillis.last()
+        }
+        timeSinceLastString.add(formatDuration(sinceLastMillis.toDuration(DurationUnit.MILLISECONDS)))
+
+        intervalStartTimeMillis = System.currentTimeMillis()
+        intervalStartMillis.add(intervalStartTimeMillis)
+        isStopwatchInInterval = true
         coroutineScopeStopwatch.launch {
-            while (isStopwatchActive) {
+            while (isStopwatchInInterval) {
                 delay(50L)
-                stopwatchMillis += System.currentTimeMillis() - stopwatchLatestTimeMillis
-                stopwatchLatestTimeMillis = System.currentTimeMillis()
+                stopwatchMillis = System.currentTimeMillis() - intervalStartTimeMillis
                 duration = formatDuration(stopwatchMillis.toDuration(DurationUnit.MILLISECONDS))
             }
         }
 
     }
 
-    private fun stopStopwatch() {
-        isStopwatchActive = false
+    private fun stopInterval() {
+        if (!isStopwatchInInterval) return
+
+        roundTimeString.add(formatTime(LocalDateTime.now()))
+        roundSplitString.add(
+            formatDuration(
+                stopwatchMillis.toDuration(DurationUnit.MILLISECONDS)
+            )
+        )
+        intervalMillis.add(System.currentTimeMillis())
+
+        duration = "00:00.0"
+        stopwatchMillis = 0L
+
+        isStopwatchInInterval = false
         coroutineScopeStopwatch.cancel()
         coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
     }
 
     fun resetStopwatch() {
-        isStopwatchActive = false
         coroutineScopeStopwatch.cancel()
         coroutineScopeStopwatch = CoroutineScope(Dispatchers.Main)
         duration = "00:00.0"
         roundTimeString.clear()
         roundSplitString.clear()
+        timeSinceLastString.clear()
         stopwatchMillis = 0L
     }
 
-    fun roundStopwatch() {
-        if (!isStopwatchActive) return
-
-        roundTimeString.add(formatTime(LocalDateTime.now()))
-        val durationMillis = if (roundMillis.isEmpty()) {
-            stopwatchMillis
-        } else {
-            System.currentTimeMillis() - roundMillis.last()
-        }
-        roundSplitString.add(
-            formatDuration(
-                durationMillis.toDuration(DurationUnit.MILLISECONDS)
-            )
-        )
-        roundMillis.add(System.currentTimeMillis())
-    }
 
 }
