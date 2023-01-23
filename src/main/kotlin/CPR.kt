@@ -22,6 +22,11 @@ class CPR {
                 val duration = System.currentTimeMillis() - cprStartMillis
                 beat = (duration / mspb).toInt() % 4
                 totalBeat = (duration / mspb).toInt() + 1
+                if (totalBeat >= 30) {
+                    isCprActive = false
+                    this.coroutineContext.cancel()
+                    coroutineScopeBeat = CoroutineScope(Dispatchers.Main)
+                }
             }
         }
     }
