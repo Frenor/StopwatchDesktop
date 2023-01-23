@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 class CPR {
     var beat by mutableStateOf(-1)
     var totalBeat by mutableStateOf(0)
-    private val mspb = 600L
+    private val mspb = 620L
     private var coroutineScopeBeat = CoroutineScope(Dispatchers.Main)
     private var cprStartMillis = 0L
     private var isCprActive = false
