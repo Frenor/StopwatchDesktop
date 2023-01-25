@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.nordmoen"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -37,14 +37,13 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "stopwatch-desktop"
-            packageVersion = "1.0.3"
+            packageVersion = "1.0.4"
             macOS {
                 iconFile.set(project.file("icons/icon.icns"))
             }
             windows {
                 iconFile.set(project.file("icons/icon.ico"))
             }
-
         }
     }
 }
