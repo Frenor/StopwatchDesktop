@@ -46,6 +46,25 @@ fun App(backgroundColor: Color) {
                     cpr = cpr
                 )
             }
+            BottomAppBar {
+                BottomNavigation {
+                    BottomNavigationItem(
+                        onClick = { selectedState = if (selectedState == "cpr") "" else "cpr" },
+                        icon = { Icon(Icons.Default.Favorite, contentDescription = null) },
+                        label = { Text("HLR") },
+                        selected = selectedState == "cpr"
+                    )
+                    BottomNavigationItem(
+                        onClick = {
+                            selectedState = if (selectedState == "stopwatch") "" else "stopwatch"
+                        },
+                        icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
+                        label = { Text("Stoppeklokke") },
+                        selected = selectedState == "stopwatch"
+                    )
+                }
+            }
+
         }
     }
 }
