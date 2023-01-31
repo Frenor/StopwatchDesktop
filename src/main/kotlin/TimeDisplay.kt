@@ -1,7 +1,12 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,19 +24,27 @@ import kotlin.math.ceil
 
 @Composable
 fun TimeDisplay(
-    formattedTime: String, formattedDate: String, modifier: Modifier
+    time: Time, modifier: Modifier, onCopyClick: (String) -> Unit
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AutoSizeText(
+                text = time.currentTime,
+                fontWeight = FontWeight.Bold,
+            )
+            IconButton(onClick = { onCopyClick(time.currentTime + " ") }) {
+                Icon(
+                    Icons.Default.Send,
+                    contentDescription = null
+                )
+            }
+        }
         AutoSizeText(
-            text = formattedTime,
-            fontWeight = FontWeight.Bold,
-        )
-        AutoSizeText(
-            text = formattedDate,
+            text = time.currentDate,
             fontWeight = FontWeight.Light,
         )
     }

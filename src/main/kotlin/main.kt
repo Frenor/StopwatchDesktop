@@ -1,102 +1,82 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
+
 @Composable
 @Preview
-fun App() {
-    MaterialTheme {
+fun App(backgroundColor: Color) {
+    var selectedState by remember { mutableStateOf("") }
+    val clipboardManager = LocalClipboardManager.current
+
+    MaterialTheme() {
         Column(
-            verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxSize().background(backgroundColor)
         ) {
             var time = remember { Time() }
             var cpr = remember { CPR() }
             var stopWatch = remember { StopWatch() }
-            var isStopwatch by remember { mutableStateOf(false) }
-            var isCPR by remember { mutableStateOf(false) }
             TimeDisplay(
-                formattedTime = time.currentTime,
-                formattedDate = time.currentDate,
-                modifier = Modifier.weight(1F).fillMaxWidth()
+                time = time, modifier = Modifier.weight(1F).fillMaxWidth(),
+                onCopyClick = { value -> clipboardManager.setText(AnnotatedString(value)) }
             )
-            if (isStopwatch) {
+            if (selectedState == "stopwatch") {
                 StopwatchDisplay(
-                    formattedTime = stopWatch.duration,
-                    timestamps = stopWatch.intervalStartString,
-                    splits = stopWatch.intervalDurationString,
-                    sinceLast = stopWatch.timeSinceLastString
+                    stopWatch = stopWatch,
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = stopWatch::startStopInterval
-                    ) { Text(if (stopWatch.isStopwatchInInterval) "Stopp intervall" else "Start intervall") }
-                    Spacer(Modifier.size(20.dp))
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            if (stopWatch.intervalDurationString.isEmpty()) {
-                                stopWatch.resetStopwatch()
-                                isStopwatch = false
-                            } else {
-                                stopWatch.resetStopwatch()
-                            }
-                        }
-                    ) {
-                        Text(if (stopWatch.intervalDurationString.isEmpty()) "Avslutt" else "Tilbakestill")
-                    }
-                }
-            } else if (isCPR) {
+            } else if (selectedState == "cpr") {
                 BeatDisplay(
-                    beat = cpr.beat, totalBeat = cpr.totalBeat
+                    cpr = cpr
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = cpr::startCPR
-                    ) { Text("Start HLR") }
-                    Spacer(Modifier.size(20.dp))
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = { cpr.stopCPR(); isCPR = false }) {
-                        Text("Stopp HLR")
-                    }
-                }
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = { isStopwatch = false; isCPR = true }) {
-                        Text("HLR")
-                    }
-                    Spacer(Modifier.size(20.dp))
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = { isStopwatch = true; isCPR = false }) {
-                        Text("Stoppeklokke")
-                    }
-                }
             }
         }
     }
 }
 
 fun main() = application {
-    Window(title = "Stoppeklokka", onCloseRequest = ::exitApplication) {
-        this.window.isAlwaysOnTop = true
-        App()
+    var undecorated by remember { mutableStateOf(false) }
+
+    key(undecorated) {
+        Window(
+            title = "Stoppeklokka", onCloseRequest = ::exitApplication, alwaysOnTop = true, undecorated = undecorated
+        ) {
+            val backgroundColors = mapOf("Blå" to Color.Blue, "Grå" to Color.Gray, "Hvit" to Color.White)
+
+            var backgroundColor by remember { mutableStateOf(Color.White) }
+
+            MenuBar {
+                Menu(text = "Farge") {
+                    backgroundColors.forEach { entry ->
+                        Item(
+                            text = entry.key,
+                            onClick = { backgroundColor = entry.value },
+                            icon = ColorPainter(entry.value),
+                        )
+                    }
+                }
+                Menu(text = "Test") {
+                    Item(text = "Toggle frame", onClick = { undecorated = !undecorated })
+                }
+            }
+            App(backgroundColor)
+        }
     }
 }
+
