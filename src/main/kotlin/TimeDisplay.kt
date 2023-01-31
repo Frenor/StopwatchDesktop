@@ -36,7 +36,7 @@ fun TimeDisplay(
                 text = time.currentTime,
                 fontWeight = FontWeight.Bold,
             )
-            IconButton(onClick = { onCopyClick(time.currentTime + " ") }) {
+            IconButton(onClick = { onCopyClick("[" + time.currentTime + "] ") }) {
                 Icon(
                     Icons.Default.Send,
                     contentDescription = null
